@@ -1,5 +1,5 @@
 <template>
     <div>
-        <LaserMetrics />
+        <ControlPanel />
     </div>
 </template>
