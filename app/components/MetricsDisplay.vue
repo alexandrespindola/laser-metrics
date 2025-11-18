@@ -50,11 +50,25 @@ const metrics = ref<SensorMetrics>({
   timestamp: new Date().toISOString()
 })
 
+const props = defineProps({
+  isMonitoring: {
+    type: Boolean,
+    required: true
+  }
+})
+
+const emit = defineEmits(['update:monitoring'])
+
 let updateInterval: number;
 
-onMounted(() => {
-  updateInterval = setInterval(updateMetrics, 1000)
-})
+watch(() => props.isMonitoring, (newVal) => {
+  if (newVal && !updateInterval) {
+    updateInterval = setInterval(updateMetrics, 1000);
+  } else if (!newVal && updateInterval) {
+    clearInterval(updateInterval);
+    updateInterval = 0;
+  }
+}, { immediate: true });
 
 onUnmounted(() => {
   clearInterval(updateInterval)
