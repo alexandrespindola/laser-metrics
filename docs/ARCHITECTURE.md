@@ -26,7 +26,8 @@ The Laser Sensor Monitor is a desktop application built with a hybrid architectu
 - **TypeScript**: Type safety throughout the application
 - **Pinia**: State management (auto-configured in Nuxt)
 - **Chart.js/Apache ECharts**: Real-time data visualization
-- **Tailwind CSS + DaisyUI**: Modern UI styling
+- **Tailwind CSS**: Utility-first CSS framework for rapid styling
+- **DaisyUI**: Component library built on Tailwind CSS for UI components
 
 ### Backend Layer
 
@@ -170,6 +171,122 @@ export const useSensorMonitor = () => {
 └─────────────────────────────────────────────────────────┘
 ```
 
+## Styling Architecture
+
+### Tailwind CSS Integration
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│                 Styling Layer                            │
+│  ┌─────────────────────────────────────────────────────┐│
+│  │    Tailwind CSS (Utility-First)                     ││
+│  │   - Responsive utilities (sm:, md:, lg:)            ││
+│  │   - Color system (slate, blue, green)              ││
+│  │   - Spacing, typography, layout utilities           ││
+│  │   - Dark mode support                               ││
+│  └─────────────────────────────────────────────────────┘│
+│  ┌─────────────────────────────────────────────────────┐│
+│  │    DaisyUI (Component Library)                      ││
+│  │   - Pre-built components (btn, card, modal)        ││
+│  │   - Design system themes                            ││
+│  │   - Accessibility features                         ││
+│  │   - Animation utilities                            ││
+│  └─────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────┘
+```
+
+### Tailwind CSS Architecture
+
+1. **Utility-First Approach**
+   - Atomic CSS classes for rapid development
+   - Consistent design system without custom CSS
+   - Responsive design through breakpoint prefixes
+   - Dark mode support with `dark:` prefix
+
+2. **Configuration Strategy**
+
+   ```javascript
+   // tailwind.config.js
+   module.exports = {
+     content: ['./components/**/*.{vue,js}', './layouts/**/*.vue'],
+     theme: {
+       extend: {
+         colors: {
+           primary: '#3b82f6',
+           secondary: '#64748b'
+         }
+       }
+     },
+     plugins: [require('daisyui')]
+   }
+   ```
+
+3. **Component Styling Pattern**
+
+   ```vue
+   <template>
+     <div class="card w-96 bg-base-100 shadow-xl">
+       <div class="card-body">
+         <h2 class="card-title">Sensor Data</h2>
+         <div class="stats shadow">
+           <div class="stat">
+             <div class="stat-title">Distance</div>
+             <div class="stat-value text-primary">{{ distance }}mm</div>
+           </div>
+         </div>
+       </div>
+     </div>
+   </template>
+   ```
+
+### DaisyUI Component System
+
+1. **Design Tokens**
+   - CSS custom properties for theming
+   - Semantic color naming (primary, secondary, accent)
+   - Consistent spacing and typography scales
+   - Built-in dark/light theme support
+
+2. **Component Library**
+   - **Form Components**: btn, input, select, checkbox
+   - **Layout Components**: card, hero, navbar, footer
+   - **Feedback Components**: alert, modal, loading, toast
+   - **Data Display**: table, stats, timeline, tree
+
+3. **Theme Architecture**
+
+   ```css
+   /* DaisyUI theme system */
+   :root {
+     --p: #3b82f6;      /* Primary color */
+     --pc: #ffffff;     /* Primary content */
+     --s: #64748b;      /* Secondary color */
+     --sc: #ffffff;     /* Secondary content */
+     --a: #10b981;      /* Accent color */
+     --ac: #ffffff;     /* Accent content */
+   }
+   ```
+
+### Styling Workflow
+
+1. **Development Process**
+   - Utility classes for rapid prototyping
+   - DaisyUI components for consistent UI
+   - Component variants with `@apply` directives
+   - Responsive design with breakpoint prefixes
+
+2. **Performance Optimization**
+   - PurgeCSS removes unused utilities in production
+   - Minimal CSS bundle size
+   - No runtime CSS overhead
+   - Critical CSS extraction for desktop app
+
+3. **Desktop-Specific Considerations**
+   - Fixed layouts (no mobile-first constraints)
+   - High-density information display
+   - Consistent cross-platform rendering
+   - Native-like interaction patterns
+
 ## Component Architecture
 
 ### Vue Component Hierarchy
@@ -177,23 +294,77 @@ export const useSensorMonitor = () => {
 ```text
 pages/index.vue (Root Dashboard)
 ├── ControlPanel.vue
-│   ├── Start Monitoring Button
-│   ├── Stop Monitoring Button
-│   └── Get Statistics Button
+│   ├── Start Monitoring Button (btn btn-primary)
+│   ├── Stop Monitoring Button (btn btn-secondary)
+│   └── Get Statistics Button (btn btn-accent)
 ├── MetricsDisplay.vue
-│   ├── Distance Reading
-│   ├── Temperature Display
-│   ├── Intensity Level
-│   └── Processing Time
+│   ├── Distance Reading (stat-value text-primary)
+│   ├── Temperature Display (stat-value text-info)
+│   ├── Intensity Level (stat-value text-warning)
+│   └── Processing Time (stat-value text-success)
 ├── SensorChart.vue
-│   └── Real-time Line Chart
+│   └── Real-time Line Chart (card bg-base-100)
 └── StatisticsModal.vue
-    ├── Total Readings
-    ├── Average Distance
-    ├── Min/Max Values
-    ├── Standard Deviation
-    └── Average Processing Time
+    ├── Total Readings (stat)
+    ├── Average Distance (stat)
+    ├── Min/Max Values (stat)
+    ├── Standard Deviation (stat)
+    └── Average Processing Time (stat)
 ```
+
+### Styling Integration with Components
+
+1. **Component-Based Styling**
+   ```vue
+   <!-- ControlPanel.vue -->
+   <template>
+     <div class="flex gap-4 p-4 bg-base-200 rounded-lg">
+       <button 
+         @click="startMonitoring"
+         :disabled="isMonitoring"
+         class="btn btn-primary btn-sm"
+       >
+         Start Monitoring
+       </button>
+       <button 
+         @click="stopMonitoring"
+         :disabled="!isMonitoring"
+         class="btn btn-secondary btn-sm"
+       >
+         Stop Monitoring
+       </button>
+     </div>
+   </template>
+   ```
+
+2. **Responsive Design Patterns**
+   ```vue
+   <!-- MetricsDisplay.vue -->
+   <template>
+     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+       <div class="stat bg-base-100 rounded-lg shadow">
+         <div class="stat-title">Distance</div>
+         <div class="stat-value text-primary">{{ latestReading.distance }}mm</div>
+       </div>
+       <!-- More stats... -->
+     </div>
+   </template>
+   ```
+
+3. **Theme Integration**
+   ```vue
+   <!-- SensorChart.vue -->
+   <template>
+     <div class="card w-full bg-base-100 shadow-xl">
+       <div class="card-body">
+         <h2 class="card-title text-base-content">Real-time Data</h2>
+         <div class="chart-container bg-base-200 rounded-lg p-4">
+           <canvas ref="chartCanvas" class="w-full h-64"></canvas>
+         </div>
+       </div>
+     </div>
+   </template>
+   ```
 
 ### Auto-Import Architecture
 
@@ -205,6 +376,77 @@ composables/    → Auto-imported composables
 stores/         → Auto-imported Pinia stores
 types/          → Auto-imported TypeScript types
 ```
+
+### Nuxt + Tailwind + DaisyUI Integration
+
+1. **Module Configuration**
+
+   ```typescript
+   // nuxt.config.ts
+   export default defineNuxtConfig({
+     modules: [
+       '@nuxtjs/tailwindcss',
+       '@pinia/nuxt'
+     ],
+     tailwindcss: {
+       configPath: './tailwind.config.js',
+       cssPath: '~/assets/css/tailwind.css',
+       viewer: false
+     }
+   })
+   ```
+
+2. **CSS Architecture**
+
+   ```css
+   /* assets/css/tailwind.css */
+   @tailwind base;
+   @tailwind components;
+   @tailwind utilities;
+   
+   /* Custom component styles */
+   @layer components {
+     .sensor-card {
+       @apply card bg-base-100 shadow-xl border border-base-300;
+     }
+     
+     .metric-value {
+       @apply stat-value text-2xl font-mono;
+     }
+   }
+   ```
+
+3. **Theme Configuration**
+
+   ```javascript
+   // tailwind.config.js
+   module.exports = {
+     content: [
+       "./components/**/*.{js,vue,ts}",
+       "./layouts/**/*.vue",
+       "./pages/**/*.vue",
+       "./plugins/**/*.{js,ts}",
+       "./nuxt.config.{js,ts}"
+     ],
+     theme: {
+       extend: {
+         colors: {
+           sensor: {
+             distance: '#3b82f6',
+             temperature: '#ef4444',
+             intensity: '#10b981',
+             processing: '#f59e0b'
+           }
+         }
+       }
+     },
+     plugins: [require('daisyui')],
+     daisyui: {
+       themes: ['light', 'dark', 'cupcake'],
+       darkTheme: 'dark'
+     }
+   }
+   ```
 
 ## Security Architecture
 
