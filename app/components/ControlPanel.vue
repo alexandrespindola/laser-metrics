@@ -17,8 +17,6 @@
 
 <script lang="ts" setup>
 
-import { ref } from 'vue'
-
 const isMonitoring = ref(false)
 const hasData = ref(false)
 
