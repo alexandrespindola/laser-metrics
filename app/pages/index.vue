@@ -1,5 +1,5 @@
 <template>
     <div>
-        <HelloNuxt />
+        <LaserMetrics />
     </div>
 </template>
